@@ -2,21 +2,22 @@ package middleware
 
 import (
 	"context"
+	"github.com/simabdi/auth-service/contextkey"
 	"github.com/simabdi/auth-service/service"
 	"net/http"
 	"strings"
 )
 
-type contextKey struct {
-	name string
-}
-
-var (
-	contextUserID = &contextKey{"user_id"}
-	contextUUID   = &contextKey{"uuid"}
-	contextRef    = &contextKey{"ref"}
-	contextRefID  = &contextKey{"ref_id"}
-)
+//type contextKey struct {
+//	name string
+//}
+//
+//var (
+//	contextUserID = &contextKey{"user_id"}
+//	contextUUID   = &contextKey{"uuid"}
+//	contextRef    = &contextKey{"ref"}
+//	contextRefID  = &contextKey{"ref_id"}
+//)
 
 func Authenticate(authService service.AuthService) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
@@ -33,10 +34,15 @@ func Authenticate(authService service.AuthService) func(next http.Handler) http.
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), contextUserID, authInfo.UserID)
-			ctx = context.WithValue(ctx, contextUUID, authInfo.Uuid)
-			ctx = context.WithValue(ctx, contextRef, authInfo.RefType)
-			ctx = context.WithValue(ctx, contextRefID, authInfo.RefID)
+			//ctx := context.WithValue(r.Context(), contextUserID, authInfo.UserID)
+			//ctx = context.WithValue(ctx, contextUUID, authInfo.Uuid)
+			//ctx = context.WithValue(ctx, contextRef, authInfo.RefType)
+			//ctx = context.WithValue(ctx, contextRefID, authInfo.RefID)
+
+			ctx := context.WithValue(r.Context(), contextkey.UserIDKey, authInfo.UserID)
+			ctx = context.WithValue(ctx, contextkey.UUIDKey, authInfo.Uuid)
+			ctx = context.WithValue(ctx, contextkey.RefKey, authInfo.RefType)
+			ctx = context.WithValue(ctx, contextkey.RefIDKey, authInfo.RefID)
 
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
